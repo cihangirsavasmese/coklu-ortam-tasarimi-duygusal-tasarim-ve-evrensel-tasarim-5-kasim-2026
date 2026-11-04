@@ -1,4 +1,4 @@
-# Duygusal Tasarım ve Evrensel Tasarım
+# Mayer ve 15 İlke
 
 **Çoklu Ortam Tasarımı** dersi sunumu · 5 Kasım 2026
 Gazi Üniversitesi · Eğitim Teknolojisi Tezli Yüksek Lisans
