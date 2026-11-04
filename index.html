@@ -60,6 +60,52 @@ body{position:fixed;inset:0}
 body:not(.idle) #hint{opacity:.7}
 #rot{display:none;position:fixed;left:0;right:0;bottom:24px;text-align:center;font:15px system-ui,sans-serif;color:#d9c9a8}
 @media (orientation:portrait) and (max-width:900px){#rot{display:block}#hint{display:none}}
+#blackout{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .3s;z-index:9}
+body.black #blackout{opacity:1}
+/* ---------- Önizleme kopyası (sunucu penceresindeki "sıradaki" kutusu) ---------- */
+.final .slide,.final .b{transition:none!important}
+.final #hint,.final #rot{display:none}
+/* ---------- Sunucu görünümü (S tuşu ikinci pencerede açar) ---------- */
+#pv{display:none}
+.sunucu body{background:#0c0e13;overflow:auto}
+.sunucu body.idle{cursor:auto}
+.sunucu #hint,.sunucu #rot,.sunucu #blackout{display:none}
+.sunucu #pv{position:fixed;inset:0;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:16px;padding:16px;box-sizing:border-box;font-family:'Inter',system-ui,sans-serif;color:#e6e9f0}
+#pv header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;font-size:14px;font-weight:700;letter-spacing:.14em;color:#8a93a6}
+#pv header span{letter-spacing:.04em;color:#c9cfdb;font-weight:600}
+#pvStage,#pvNext{position:relative;overflow:hidden;background:#000;border-radius:10px;box-shadow:0 0 0 1px #262b36}
+#pvStage{height:min(56vh,calc((62.5vw - 40px) * .5625));cursor:pointer}
+#pvStage.kara{box-shadow:0 0 0 3px #2997FF}
+#pvStage.kara::after{content:"PERDE KARARTILDI · B";position:absolute;left:12px;top:12px;z-index:5;padding:6px 12px;border-radius:6px;background:#2997FF;color:#fff;font-size:13px;font-weight:700;letter-spacing:.08em}
+#pvNext{height:min(30vh,calc((37.5vw - 40px) * .5625))}
+#pvNext iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
+#pvNext .son{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:20px;color:#8a93a6}
+#pvNext.bitti iframe{display:none}
+#pvNext.bitti .son{display:flex}
+.pv-side{grid-row:1 / span 2;grid-column:2;display:flex;flex-direction:column;gap:16px;min-height:0}
+.pv-time{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pv-time>div{padding:14px 18px;border-radius:10px;background:#161a22}
+.pv-time small{display:block;font-size:12px;font-weight:700;letter-spacing:.14em;color:#8a93a6}
+.pv-time b{display:block;margin-top:4px;font-size:46px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.pv-time i{font-style:normal;font-size:18px;font-weight:600;color:#8a93a6}
+#pvEl{cursor:pointer}
+#pvEl.dur{opacity:.45}
+#pvEl.az{color:#F2B84B}
+#pvEl.bitti{color:#FF7A45}
+.pv-btn{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pv-btn button{padding:16px 10px;border:0;border-radius:10px;background:#1d2230;color:#e6e9f0;font:700 17px/1 'Inter',system-ui,sans-serif;cursor:pointer}
+.pv-btn button:hover{background:#283043}
+.pv-btn button.ana{background:#C2410C}
+.pv-btn button.ana:hover{background:#E0501A}
+.pv-keys{margin-top:auto;font-size:13px;line-height:1.7;color:#6f788b}
+.pv-keys kbd{display:inline-block;padding:1px 6px;border-radius:4px;background:#1d2230;color:#c9cfdb;font:600 12px/1.4 inherit}
+.pv-notes{display:flex;flex-direction:column;min-height:0}
+#pvNotes{flex:1;overflow:auto;padding:18px 24px;border-radius:10px;background:#161a22;font-size:var(--nf,24px);line-height:1.45}
+#pvNotes p{margin:0 0 .5em}
+#pvNotes b{color:#fff}
+#pvNotes .tk{display:inline-block;padding:0 8px;margin-right:4px;border-radius:6px;background:#C2410C;color:#fff;font-size:.7em;font-weight:700;vertical-align:2px}
+#pvNotes .tk.done{opacity:.35}
+#pvNotes .tk.simdi{background:#2997FF}
 </style></head><body>
 <div id="stage">
 <section class="slide" data-n="1" id="cover" data-transition="fade" style="background:#0B0B0F;color:#F5F5F7;font-family:'Inter', Arial, sans-serif;padding:128px 128px 160px">
@@ -420,14 +466,53 @@ body:not(.idle) #hint{opacity:.7}
 </div>
 </section>
 </div>
+<div id="blackout"></div>
 <div id="rot">Daha rahat görmek için telefonu yan çevirin · ileri-geri için kaydırın</div>
-<div id="hint">→ / boşluk: ileri · ←: geri · F: tam ekran · <span id="pos"></span></div>
+<div id="hint">→ / boşluk: ileri · ←: geri · F: tam ekran · S: sunucu görünümü · B: karart · <span id="pos"></span></div>
+<div id="pv">
+  <section class="pv-cur"><header><b>ŞU AN</b><span id="pvNo"></span></header><div id="pvStage"></div></section>
+  <aside class="pv-side">
+    <div><header><b>SIRADAKİ</b><span id="pvNextT"></span></header><div id="pvNext"><iframe title="Sıradaki slayt" tabindex="-1"></iframe><div class="son">Son slayt</div></div></div>
+    <div class="pv-time">
+      <div><small>GEÇEN SÜRE</small><b id="pvEl" title="Tıkla: durdur / devam">00:00</b><i>hedef 30:00</i></div>
+      <div><small>SAAT</small><b id="pvClock">--:--</b><i id="pvLeft"></i></div>
+    </div>
+    <div class="pv-btn">
+      <button data-k="prev">◀ Geri</button><button class="ana" data-k="next">İleri ▶</button>
+      <button data-k="black">Perdeyi karart</button><button data-k="reset">Süreyi sıfırla</button>
+    </div>
+    <div class="pv-keys"><kbd>→</kbd> <kbd>Boşluk</kbd> ileri (her tıklama bir adım) · <kbd>←</kbd> geri · <kbd>B</kbd> karart · <kbd>+</kbd> <kbd>−</kbd> not yazısı · <kbd>Home</kbd> <kbd>End</kbd> baş/son<br>Seyirci penceresini projeksiyona taşıyıp içine tıklayın ve <kbd>F</kbd> ile tam ekran yapın. Kumanda iki pencerede de çalışır.</div>
+  </aside>
+  <section class="pv-notes"><header><b>NOTLAR</b><span id="pvStep"></span></header><div id="pvNotes"></div></section>
+</div>
+<template id="notlar">
+<div data-i="0" data-t="Mayer ve 15 İlke"><p>Merhaba. Bugün tek bir kuramı ve onun on beş ilkesini konuşacağız: Richard Mayer'in çoklu ortamla öğrenmenin bilişsel kuramı. Basitten başlayacağız: önce bir soru, sonra Mayer kim, kuram ne diyor, sonra on beş ilke ve kurgu masasından örnekler. Sunumun yarısı kuram, yarısı pratik.</p><p><b>Not:</b> Bu sunumun kendisi de kuramın ilkelerine göre tasarlandı; sonda birlikte kontrol edeceğiz.</p></div>
+<div data-i="1" data-t="180 derece kuralı nedir?"><p>Başlamadan küçük bir deney yapalım; benim alanımdan bir kural öğreneceksiniz. Adı 180 derece kuralı; her kurgucunun bildiği, çiğnenince izleyicinin "bir şey ters" dediği kural.</p><p>Önce soldaki metni okuyun. (20 saniye bekle.) Peki, biri anlatsın: Kamera nereye geçerse ne olur? (Büyük ihtimalle tereddüt edecekler; metin doğru ama zihinde canlandırmak zor.)</p><p><span class="tk">Tıkla</span> Şimdi aynı kural, kuşbakışı bir şemayla. A ve B karşılıklı; aralarından geçen kesik çizgi hayali çizgi. Yeşil taraf kamera tarafı: 1 ve 2 numaralı kameralar burada, ikisi de olur. Kırmızı taraf yasak: 3 numaralı kamera çizgiyi geçmiş.</p><p><span class="tk">Tıkla</span> Soru: 2. kameradan 3. kameraya kesersek ne olur? (Cevap bekle; artık çoğu söyleyebilir: yer değiştirirler.)</p><p><span class="tk">Tıkla</span> Evet: 1 ve 2'den A solda B sağda; 3'ten bakınca B solda A sağda. İzleyici kimin kime baktığını kaybeder. Bu yüzden kurguda çizgiyi geçen plan ya atılır ya araya nötr bir plan konur.</p><p>Şimdi asıl soru: Bu kuralı az önce öğrendiniz. Kelimelerden mi öğrendiniz, resimden mi? Metin eksiksizdi; ama anlamanız şemayla oldu. Mayer'in bütün işi bu basit gözlemle başlıyor: <span class="tk">Tıkla</span> İnsanlar yalnızca kelimelerden değil, kelime ve resimden daha iyi öğrenir. Buna çoklu ortam ilkesi deniyor; on beş ilkenin ilki ve en temeli.</p><p>Peki neden? Ve her resim işe yarar mı? Konfeti de resim. Mayer otuz yıldır bu iki soruyu deniyor; bugün önce "neden"i, sonra "hangi resim, nasıl"ı konuşacağız.</p><p>(Çoklu ortam burada "kelime + resim" demek: kelime yazılı ya da sözlü, resim durağan ya da hareketli olabilir. Teknolojiyle ilgisi yok; kara tahtaya çizilen şema da çoklu ortamdır.)</p></div>
+<div data-i="2" data-t="Otuz yıldır tek soru."><p>Richard Mayer kim? <span class="tk">Tıkla</span> Otuz yıldır tek bir soru soruyor: İnsanlar kelime ve resimden nasıl öğrenir?</p><p><span class="tk">Tıkla</span> Eğitim psikoloğu; Kaliforniya Üniversitesi Santa Barbara'da. Önemli olan şu: Görüş yazmıyor, deney yapıyor. "Bence video iyidir" demiyor; iki grup, iki sürüm, test.</p><p><span class="tk">Tıkla</span> Yöntemi hep aynı: Aynı dersi, örneğin "yıldırım nasıl oluşur"u, iki biçimde anlatıyor. Bir grup birini, diğer grup ötekini görüyor. Sonra test: hatırlama ve transfer, yani öğrendiğini yeni soruya uygulama. Hangi biçim daha iyi öğretti? Bunu yüzlerce kez, farklı konularda tekrarladı.</p><p><span class="tk">Tıkla</span> Sonuçları bir kitapta topladı: Multimedia Learning. 2001'de ilk baskı, 2009'da ikinci, 2020'de üçüncü. İlk baskıda yedi ilke vardı, ikincide on iki, üçüncüde on beş. Yani liste "düşünüldü" değil, "bulundu": her ilke yeterli deney birikince eklendi.</p><p><span class="tk">Tıkla</span> O yüzden bu bir kuram ama aynı zamanda otuz yıllık bir deney dizisi. Bugün anlatacağım on beş ilkenin her birinin arkasında "şu kadar deney, şu kadarında işe yaradı" diyen bir tablo var. Ben tabloları değil, ilkelerin ne dediğini anlatacağım.</p><p>(Mayer en çok atıf alan eğitim psikologlarından biri; Cambridge Handbook of Multimedia Learning'in de editörü.)</p></div>
+<div data-i="3" data-t="Her ders videosu, her slayt, her e-içerik bir çoklu ortam mesajıdır."><p>Neden bu kuram önemli? <span class="tk">Tıkla</span> Çünkü ürettiğimiz her şey, her ders videosu, her slayt, her etkileşimli içerik bir çoklu ortam mesajı: kelime artı resim. Bu mesajın nasıl tasarlandığı, öğrencinin ne öğreneceğini belirliyor.</p><p>Mayer kitabın başında iki yaklaşımı ayırıyor. <span class="tk">Tıkla</span> Teknoloji merkezli yaklaşım "teknoloji ne yapabilir" diye sorar. Yüz yıldır aynı hikâye: sinema filmleri sınıfa girdi, sonra televizyon, sonra bilgisayar, şimdi yapay zekâ ve VR. Her seferinde "eğitim devrimi" dendi, her seferinde sınıfta pek bir şey değişmedi. Çünkü soru yanlıştı.</p><p><span class="tk">Tıkla</span> Öğrenen merkezli yaklaşım "insan zihni nasıl öğrenir" diye sorar ve teknolojiyi ona göre kullanır. Araç değişir, zihin değişmez.</p><p><b>Kendi işimden:</b> Stüdyoda elimizde ne var sorusu kolay: 4K kamera, yeşil perde, animasyon ekibi. Zor soru şu: Bu videoyu izleyen ortaokul öğrencisinin kafasında ne olacak? Mayer'in kuramı tam olarak bu ikinci soruya cevap veriyor. Şimdi o cevaba geçelim: zihin çoklu ortam mesajını nasıl işliyor?</p></div>
+<div data-i="4" data-t="Zihin hakkında üç varsayım."><p>Mayer'in kuramı zihin hakkında üç varsayıma dayanıyor. Üçü de başkalarının bulguları; Mayer onları birleştirdi.</p><p><span class="tk">Tıkla</span> Birincisi, iki kanal. Göz ve kulak ayrı yollar; resim gözden, konuşma kulaktan girer. Sinema bunu yüz yıldır biliyor: sessiz filmde tek kanal vardı, sesli film iki kanalı açtı. (Paivio'nun ikili kodlama kuramı.)</p><p><span class="tk">Tıkla</span> İkincisi, sınırlı kapasite. Her kanal aynı anda yalnızca birkaç parça bilgi tutabilir. Fazlası dökülür, kaybolur. Kurgu masasından biliyoruz: izleyiciye aynı anda altyazı, grafik, anlatıcı sesi ve müzik verirsen bir şey kalmaz. (Baddeley'nin çalışma belleği, Sweller'ın bilişsel yük kuramı.)</p><p><span class="tk">Tıkla</span> Üçüncüsü, aktif işleme. Öğrenci bir kayıt cihazı değil; gördüğünü olduğu gibi depolamıyor. Seçiyor, düzenliyor, bildikleriyle bütünleştiriyor. Yani öğrenci bir kurgucu.</p><p><span class="tk">Tıkla</span> Üçünü birleştirince şu resim çıkıyor: Dar bir kurgu masasında, iki kanaldan gelen malzemeyle kendi filmini kuran bir kurgucu. Bizim işimiz o kurgucuya iyi malzeme vermek ve masasını gereksiz şeylerle doldurmamak. Bir sonraki slaytta bu masayı çizeceğim.</p></div>
+<div data-i="5" data-t="Zihinde ne oluyor?"><p>Mayer'in meşhur şeması, sadeleştirilmiş hâli. Soldan sağa okuyalım.</p><p>Solda bizim ürettiğimiz şey: kelimeler ve resimler. Kelimeler kulağa (anlatım) ya da göze (yazı) gider; kesik çizgi bunu gösteriyor: ekrandaki yazı aslında göz kanalını kullanır. Resimler göze gider. Burası duyusal bellek: her şey bir an için orada, sonra çoğu gider.</p><p><span class="tk">Tıkla</span> Birinci iş: seçme. Kurgucu ham çekimden hangi sahneleri alacağına karar verir. Öğrenci de gelen kelimelerin ve görüntülerin bir kısmını çalışma belleğine alır; hepsini değil, çünkü masa dar.</p><p><span class="tk">Tıkla</span> İkinci iş: düzenleme. Seçilen parçalar sıralanır, bağlanır. Kelimelerden bir sözel model, görüntülerden bir resimsel model kurulur. Aradaki dikey ok önemli: iki model birbirine bağlanır. "Kurgu" kelimesi ile film şeridi resmi aynı şey diye eşleşir.</p><p><span class="tk">Tıkla</span> Üçüncü iş: bütünleştirme. İki model, uzun süreli bellekteki ön bilgiyle birleşir. Öğrenci "ha, bu benim telefonla video çekerken yaptığım şeyin profesyonel hâli" der. Öğrenme tam burada olur.</p><p><span class="tk">Tıkla</span> Özet: Üst sıra kulak, alt sıra göz, ortadaki dar masa çalışma belleği. Bizim tasarım kararlarımızın hepsi bu masayı rahatlatmak ya da bu üç işi (seç, düzenle, bütünleştir) kolaylaştırmak için. On beş ilke tam olarak bunu yapıyor.</p></div>
+<div data-i="6" data-t="Zihin aynı anda üç iş yapar."><p>Masa dar demiştik. Mayer o masada üç tür iş olduğunu söylüyor; on beş ilkenin hepsi bu üçünden birine hizmet ediyor.</p><p><span class="tk">Tıkla</span> Gereksiz iş: Konuyla ilgisi olmayan ama zihni meşgul eden her şey. Kurgu masasından: konfeti, ilgisiz fon müziği, etiketi resmin ters köşesine koymak, anlatıcının söylediğini bir de ekrana yazmak. Bunlar öğrenciye yük bindirir ama öğretmez. Beş ilke bunu azaltmak için.</p><p><span class="tk">Tıkla</span> Zorunlu iş: Konunun kendi zorluğu. 180 derece kuralının kendisi: hayali çizgi, kamera tarafı, kesme; bunu öğrenmek kaçınılmaz bir çaba. Yok edemeyiz ama yönetebiliriz: parçalara bölerek, önce terimleri öğreterek, doğru kanalı kullanarak. Üç ilke bunun için.</p><p><span class="tk">Tıkla</span> Üretici iş: Öğrencinin anlamak için gönüllü verdiği çaba; modelde "düzenleme" ve "bütünleştirme" dediğimiz şey. Burada istek gerekir: Öğrenci masayı boş bulsa bile çalışmak istemezse öğrenmez. Yedi ilke bunu artırmak için.</p><p><span class="tk">Tıkla</span> Formül basit: On beş ilke eşittir beş azalt, üç yönet, yedi artır. Şimdi bu üç grubu sırayla göreceğiz; her ilke için tek cümle ve kurgu masasından bir örnek.</p><p>(Sweller'ın bilişsel yük kuramıyla akraba: orada da dışsal, içsel ve ilgili yük diye üç tür var.)</p></div>
+<div data-i="7" data-t="Beş ilke: masadan kaldır."><p>Birinci grup: gereksiz işi azaltan beş ilke. Hepsinin mantığı aynı: masadan kaldır.</p><p><span class="tk">Tıkla</span> Tutarlılık: Konuyla ilgisi olmayan kelime, resim ve sesi çıkar. En bilinen ilke; bir sonraki slaytta örnekle göstereceğim.</p><p><span class="tk">Tıkla</span> İşaretleme: Önemli olanı göster. Bir ok, bir vurgu rengi, bir başlık; ya da anlatıcının "üç aşama var, birincisi" demesi. Öğrencinin "neye bakacağım" diye harcadığı çabayı kaldırır.</p><p><span class="tk">Tıkla</span> Artıklık: Anlatıcının söylediğini kelimesi kelimesine bir de ekrana yazma. Resim artı ses yeter; bir de yazı eklersen göz kanalı resim ile yazı arasında bölünür. (Dikkat: Altyazı bu ilkeyle çelişmez; altyazı erişilebilirlik için konur ve kısa tutulur. Mayer'in itirazı, anlatımın tamamını ekrana basmaya.)</p><p><span class="tk">Tıkla</span> Uzamsal yakınlık: Etiket resmin üstünde, ilgili parçanın yanında olsun; ekranın altındaki ayrı bir listede değil. Öğrenci göz gezdirerek eşleştirme yapmasın.</p><p><span class="tk">Tıkla</span> Zamansal yakınlık: Anlatım ve görüntü aynı anda gelsin. Önce iki dakika anlatıp sonra animasyonu göstermek, masayı iki kat yorar.</p><p><b>Kurgu masasından:</b> Bu beşi aslında iyi bir kurgucunun alışkanlıkları. Fazlalığı kes, önemli olanı vurgula, aynı şeyi iki kez söyleme, yazıyı görüntünün üstüne koy, sesi görüntüyle senkronla. Dudak senkronu kaydığında izleyici nasıl rahatsız olursa, anlatımla görüntü kaydığında öğrenci de öyle oluyor.</p></div>
+<div data-i="8" data-t="Süs nerede durmalı?"><p>Tutarlılık ilkesini bir örnekle görelim. Solda film yapım şeması, yalnızca konunun öğeleri: senaryo, kamera, film şeridi, perde.</p><p><span class="tk">Tıkla</span> Sağda aynı şema, "daha eğlenceli olsun" diye eklenmiş şeylerle: "Ödül aldık!" balonu, patlamış mısır, kırmızı halı, altın heykelcik, konfetiler. Hiçbiri filmin nasıl yapıldığıyla ilgili değil. Mayer bunlara çekici ayrıntı diyor: seductive details. İlginç, dikkat çekici ama konu dışı. Dersin okuma listesindeki Sundararajan ve Adesope (2020) onlarca deneyi topladı: çekici ayrıntılar öğrenmeyi düşürüyor. Modelle açıklaması basit: Konfeti de göz kanalından giriyor, masada yer kaplıyor, ama hiçbir modele bağlanmıyor.</p><p><span class="tk">Tıkla</span> Sinemada bunun yüz yıllık bir adı var: Çehov'un tüfeği. Çehov 1889'da bir mektupta şöyle yazıyor: "One must never place a loaded rifle on the stage if it isn't going to go off." Sahnede duvarda bir tüfek asılıysa oyun bitmeden patlamalı; patlamayacaksa oraya asılmamalı. Senaristlerin ilk öğrendiği kural; tutarlılık ilkesi bunun öğretim tasarımındaki hâli.</p><p><b>Kurgu masasından:</b> Her filmin kesilen sahneleri vardır. Kötü oldukları için kesilmezler; çoğu güzeldir, ekip onları sever. Hikâyeye hizmet etmedikleri için kesilir. Ders videosunda en sevdiğimiz drone çekimi de hedefe hizmet etmiyorsa kesilen sahnedir.</p><p><b>Kendi işimden:</b> Yapay zekâ ile görsel üretirken bu ilke en çok çiğnenen ilke. "Kamera" isteyince model etrafına konfeti, ışık, kırmızı halı koyuyor; sağdaki resmi çok seviyor. Ayıklamak bize kalıyor.</p></div>
+<div data-i="9" data-t="Kurgucular bunu zaten biliyor."><p>Beş ilkeden üçünü kurgu masasından örnekleyeyim, çünkü kurgucular bunları zaten biliyor; adını bilmiyorlar.</p><p><span class="tk">Tıkla</span> İşaretleme: Bir şemada önemli parçayı büyütürüz, renklendiririz, ok koyarız. Sinema yüz yıldır aynı şeyi yapıyor: kamera önemli olana yaklaşır, ışık onu ayırır, alan derinliği arkayı bulanıklaştırır. Hepsi "buraya bak" demek.</p><p><span class="tk">Tıkla</span> Uzamsal yakınlık: Bir organın, bir parçanın adını onun üstüne yazarız; ekranın altında ayrı bir liste yapıp "1 numara şudur" demeyiz. Göz gidip gelmesin, masa yorulmasın.</p><p><span class="tk">Tıkla</span> Zamansal yakınlık: Anlatıcı "kurgu" dediği anda kurgu görüntüsü gelsin. Bunu her kurgucu bilir: ses ve görüntü birbirinden kayarsa, dudak senkronu bozulur gibi rahatsız eder. Öğrenmede de aynı: anlatım ile görüntü aynı anda gelmezse öğrenci ikisini kafasında eşleştirmek için ekstra çaba harcar.</p><p><span class="tk">Tıkla</span> Mayer'in yaptığı, kurgucunun sezgisini deneyle doğrulamak ve ad vermek. Bu önemli, çünkü sezgi tartışılır, deney tartışılmaz; ve adı olan şey öğretilebilir.</p><p>(Buraya YEĞİTEK'ten kısa bir anı: bir videoda etiketleri ayrı listeye koyup sonra geri aldığınız, ya da anlatımla animasyonun kaydığı bir örnek varsa bir cümleyle anlat.)</p></div>
+<div data-i="10" data-t="Üç ilke: zor konuyu taşınabilir yap."><p>İkinci grup: konunun kendi zorluğunu yöneten üç ilke. Konu zor olabilir; masayı taşıyacak hâle getiriyoruz.</p><p><span class="tk">Tıkla</span> Bölümleme: Uzun bir anlatımı parçalara böl ve öğrenciye kontrol ver; her parçadan sonra "devam" düğmesi. 180 derece kuralı videosu: kural, örnek, hata, düzeltme, dört kısa bölüm; öğrenci her bölümü sindirip geçer. Tek parça yirmi dakikalık video yerine dört tane beş dakikalık.</p><p><span class="tk">Tıkla</span> Ön eğitim: Ana anlatıma girmeden önce temel terimleri ve parçaları öğret. "Hayali çizgi" kelimesini ilk kez kuralın ortasında duyan öğrenci, hem kelimeyi hem kuralı aynı anda öğrenmeye çalışır; masa taşar. Önce "hayali çizgi nedir, plan nedir, kesme nedir" diye kısa bir tanıtım, sonra kural.</p><p><span class="tk">Tıkla</span> Kiplik: Bir animasyonu ekrandaki yazıyla değil, anlatıcı sesiyle açıkla. Yazı da animasyon da göz kanalından girer; ikisi aynı kanalı boğar. Ses kulak kanalını kullanır, göz animasyona kalır. Bu, iki kanal varsayımının doğrudan sonucu.</p><p><span class="tk">Tıkla</span> Sinema yüz yıldır aynı üç şeyi yapıyor: Film sahnelere bölünür; karakterler ilk perdede tanıtılır (önce kim olduklarını öğreniriz, sonra ne yaptıklarını); görüntü, ekrana yazı basılarak değil sesle anlatılır. Sessiz filmlerin ara yazıları tam da bu yüzden sesli filmle birlikte kayboldu.</p><p><b>Dikkat:</b> Kiplik ilkesi "yazı kötü" demek değil. Ekranda hareket eden bir şey varken yazı kötü. Durağan bir şema yazıyla gayet iyi anlatılır; bu sunumdaki gibi.</p></div>
+<div data-i="11" data-t="Yedi ilke: öğrenci istesin."><p>Üçüncü ve en kalabalık grup: öğrencinin anlamak için gönüllü çaba vermesini sağlayan yedi ilke. Masa boş olsa bile öğrenci istemezse öğrenmez; bu yedi ilke isteği ve çabayı artırıyor.</p><p><span class="tk">Tıkla</span> Dokuz, çoklu ortam: Başlangıçtaki soru. Kelime artı resim, yalnızca kelimeden iyidir. Çünkü iki model kurulur ve birbirine bağlanır.</p><p><span class="tk">Tıkla</span> On, kişiselleştirme: "Öğrenci bu aşamada şunu yapmalıdır" değil, "bu aşamada sen şunu yapıyorsun". Sohbet dili, öğrenciye "biri benimle konuşuyor" hissi verir; insanlar konuşan birini anlamak için daha çok çaba gösterir.</p><p><span class="tk">Tıkla</span> On bir, ses: İnsan sesi, makine sesinden daha iyi öğretir. Kendi işimden: Bütçe için sentetik ses cazip; deneyler diyor ki anlatıcı insan olsun. (Yeni yapay zekâ sesleri bu ilkeyi yeniden test ettiriyor; Mayer'in kendi deneyleri eski sentetik seslerle.)</p><p><span class="tk">Tıkla</span> On iki, görüntü: Anlatıcının yüzünü ekranın köşesine koymak tek başına öğrenmeyi artırmaz; bazen dikkat dağıtır. Yani "hoca ekranda görünsün" otomatik iyi değil.</p><p><span class="tk">Tıkla</span> On üç, bedenleşme: Ama anlatıcı ekrandaysa jest yapsın, şemaya baksın, parmağıyla göstersin. Heykel gibi duran anlatıcı değil, insan gibi davranan anlatıcı işe yarıyor. Sinemada oyuncu yönetiminin bütün meselesi bu.</p><p><span class="tk">Tıkla</span> On dört, sarmalama: VR gözlüğüyle öğrenmek, aynı içeriği ekranda izlemekten daha iyi değil; bazen daha kötü, çünkü sarmalama masayı yorar. Teknoloji merkezli yaklaşımın bir hayal kırıklığı daha.</p><p><span class="tk">Tıkla</span> On beş, üretici etkinlik: Öğrenciye bir şey yaptır: özetlesin, çizsin, kendine açıklasın, bir arkadaşına anlatsın. Kuramın özü burada: Öğrenci kendi filmini kurar. Biz malzemeyi veririz; kurguyu o yapar.</p><p>Son üçü (bedenleşme, sarmalama, üretici etkinlik) 2020'deki üçüncü baskıyla eklendi; o yüzden eski kaynaklarda on iki ilke görürsünüz.</p></div>
+<div data-i="12" data-t="Bir EBA ders videosu, altı karar."><p>Somut bir örnek, kendi işimden: Başta öğrendiğiniz 180 derece kuralını EBA için bir ders videosu olarak üretiyoruz; medya okuryazarlığı ya da görsel sanatlar için. Sol sütunda sık yapılan, sağ sütunda ilkeye göre düzeltilmiş hâli.</p><p><span class="tk">Tıkla</span> Yirmi dakikalık tek video yerine dört bölüm: kural, örnek, hata (çizgiyi geçen kesme), düzeltme; her bölüm sonunda duraklama. Bölümleme.</p><p><span class="tk">Tıkla</span> Terimleri akışın içinde ilk kez duyurmak yerine ilk bir dakikada üç terimi tanıt: hayali çizgi, plan, kesme. Ön eğitim.</p><p><span class="tk">Tıkla</span> Animasyonun üstüne paragraf basmak yerine animasyon artı anlatıcı sesi; ekranda yalnızca kısa başlık. Kiplik ve artıklık. (Altyazı ayrı: erişilebilirlik için açılır-kapanır olarak kalır.)</p><p><span class="tk">Tıkla</span> Etiketleri ekranın altında liste yapmak yerine her etiket kendi parçasının üstünde ve anlatıldığı anda belirsin. Uzamsal ve zamansal yakınlık.</p><p><span class="tk">Tıkla</span> "Öğrenci bu aşamada şunu yapmalıdır" yerine "bu aşamada sen telefonunu alıp…"; sentetik ses yerine insan anlatıcı. Kişiselleştirme ve ses.</p><p><span class="tk">Tıkla</span> Video bitince öğrenci izleyici olarak kalmasın: son görev, iki arkadaşını karşılıklı oturtup telefonla çizginin iki yanından çekmek, kesip izlemek; kuralı kendi gözüyle bozup görmek. Üretici etkinlik; aynı zamanda az önce sınıfta yaptığımız deneyin öğrenci sürümü.</p><p>Altı karar, on ilke. Hiçbiri ek bütçe istemiyor; hepsi senaryo aşamasında verilebilecek kararlar. Kurgudan sonra düzeltmek pahalı, senaryoda düşünmek bedava.</p><p>(Buraya YEĞİTEK'ten gerçek bir örnek: hangi videoda bu kararlardan birini verdiniz ya da vermediğiniz için ne oldu; bir cümle.)</p></div>
+<div data-i="13" data-t="İlkeler kural değil, koşullu."><p>Bitirmeden üç sınır; Mayer'in kendisi de bunları söylüyor.</p><p><span class="tk">Tıkla</span> İlkeler en çok konuya yeni başlayan öğrencide işler. Uzmanlaştıkça etki küçülür, bazen tersine döner: Uzman için işaretleme gereksiz, bölümleme sıkıcı olabilir. Buna uzmanlık tersine dönme etkisi deniyor. Yani "kime" sorusu her zaman var.</p><p><span class="tk">Tıkla</span> Bulguların çoğu kısa, dakikalık derslerden ve laboratuvar deneylerinden geliyor. Bir dönem boyunca sınıfta, gerçek müfredatla ne olacağı daha az biliniyor.</p><p><span class="tk">Tıkla</span> Model "soğuk": şemada duygu, motivasyon, istek yok. Öğrenci bir kurgucu ama neden kurgu yapmak istediği sorulmuyor. Sonraki kuramlar bunu ekledi: Moreno'nun bilişsel-duyuşsal kuramı ve Plass ile Kaplan'ın bütünleşik modeli. Mayer de üçüncü baskıda "üretici işi artır" grubunu büyüterek bu eleştiriye cevap verdi; on beş ilkenin yedisi artık "öğrenci istesin" üzerine.</p><p><span class="tk">Tıkla</span> Son bir cümle, 3 Aralık'taki konuma köprü: Yapay zekâ ile görsel, ses ve video üretmek artık saniyeler sürüyor; süs bedavaya geldi. Konfeti, sentetik ses, ekrana basılmış paragraf, hepsi bir tıkla hazır. O yüzden hangi ilkeyi çiğnediğini bilmek, yani bu on beş ilke, hâlâ ve daha çok tasarımcının işi.</p></div>
+<div data-i="14" data-t="Bu sunum on beş ilkeden hangilerini çiğnedi?"><p>Bir soruyla bitirmek istiyorum. <span class="tk">Tıkla</span> Bu sunum on beş ilkeden hangilerini çiğnedi? (Birkaç dakika tartışmaya bırak. Gelmezse ipuçlarını göster.)</p><p><span class="tk">Tıkla</span> Olası cevaplar:</p><p>Artıklık: Bazı slaytlarda söylediğimi ekrana da yazdım; ama kısa başlık olarak, paragraf olarak değil. Sınırda.</p><p>Kiplik: Sunum durağan şema ve yazıdan oluşuyor, animasyon yok; o yüzden yazı burada sorun değil. Mayer'in itirazı hareketli görüntü üstüne yazıya.</p><p>Uzamsal yakınlık: Model şemasında etiketler kutuların içinde; süreç adları (seçme, düzenleme) okların altında. İyi.</p><p>Bölümleme: Dört bölüm, her bölümde durup soru sordum. İyi.</p><p>Üretici etkinlik: Başta oylama yaptırdım, şimdi bu soruyu soruyorum; ama "çizin, özetleyin" demedim. Eksik. İyi bir sunum son beş dakikada dinleyiciye bir şey yaptırır.</p><p>Görüntü ve bedenleşme: Ben ekranda değilim, önünüzdeyim; jest yapıyorum, şemayı gösteriyorum. Bedenleşme canlı.</p><p>Sonuç: Kuramı bilmek, kendi hatanı görmeyi sağlıyor. Zaten ilkelerin asıl faydası bu: kontrol listesi.</p></div>
+<div data-i="15" data-t="Kaynakça"><p>Dokuz kaynak. Asıl kaynak ilk üçü: Mayer'in kitabı (2020, üçüncü baskı; on beş ilke burada), 2024'teki özet makalesi ve el kitabı. Sundararajan ve Adesope dersin okuma listesinden; tutarlılık ilkesinin kanıtı. Paivio, Baddeley ve Sweller üç varsayımın sahipleri. Moreno ile Plass ve Kaplan, sınırlar slaytındaki "duygu" eleştirisinin sahipleri.</p><p>Sağdaki QR kod sunumun tamamını açıyor; isteyen telefonundan ya da bilgisayarından tekrar bakabilir. Teşekkürler; sorularınızı alabilirim.</p><p>(Sayfa ve cilt bilgileri teyit edilmeli.)</p></div>
+</template>
 <script>
 (function(){
 var stage=document.getElementById('stage'),slides=[].slice.call(document.querySelectorAll('.slide')),pos=document.getElementById('pos');
-// Phones widen innerWidth to fit the 1920px stage, so measure the layout viewport instead.
-function fit(){var de=document.documentElement,s=Math.min(de.clientWidth/1920,de.clientHeight/1080);stage.style.transform='scale('+s+') translate(-50%,-50%)';}
+var q=new URLSearchParams(location.search),sunucu=q.has('sunucu'),onizleme=q.has('onizleme');
+if(sunucu){document.documentElement.classList.add('sunucu');document.getElementById('pvStage').appendChild(stage);document.title='Sunucu · '+document.title;}
+if(onizleme)document.documentElement.classList.add('final');
+function fit(){var w,h;if(sunucu){var r=stage.parentNode.getBoundingClientRect();w=r.width;h=r.height;}else{var de=document.documentElement;w=de.clientWidth;h=de.clientHeight;}
+  var s=Math.min(w/1920,h/1080);stage.style.transform='scale('+s+') translate(-50%,-50%)';}
 addEventListener('resize',fit);fit();
+if(sunucu&&window.ResizeObserver)new ResizeObserver(fit).observe(stage.parentNode);
 // data-crop="ZOOM X% Y%": cover-fit, zoomed, positioned like object-position.
 [].forEach.call(document.querySelectorAll('img[data-crop]'),function(img){
   var p=img.getAttribute('data-crop').split(/\s+/),z=parseFloat(p[0])||1,d=document.createElement('div');
@@ -445,13 +530,17 @@ var steps=slides.map(function(sl){var m={};[].forEach.call(sl.querySelectorAll('
   return Object.keys(m).map(Number).sort(function(x,y){return x-y}).map(function(k){return m[k]});});
 var cur=-1,k=0,timer=null,ch=null;
 try{ch=new BroadcastChannel('coklu-ortam-5-kasim');}catch(e){}
-function report(){pos.textContent=(cur+1)+' / '+slides.length;var msg={i:cur,k:k,n:steps[cur].length,t:Date.now()};
-  if(ch)ch.postMessage(msg);try{localStorage.setItem('coklu-ortam-5-kasim',JSON.stringify(msg));}catch(e){}
-  try{history.replaceState(null,'','#'+(cur+1));}catch(e){}}
+// Sunucu penceresi ile seyirci penceresi birbirini izler (postMessage; dosyadan açılınca da çalışır).
+var base=location.href.split(/[?#]/)[0],peer=sunucu?window.opener:null;
+function send(m){try{if(peer&&!peer.closed&&!onizleme)peer.postMessage(Object.assign({deck:1},m),'*');}catch(e){}}
+function report(quiet){pos.textContent=(cur+1)+' / '+slides.length;var msg={i:cur,k:k,n:steps[cur].length,t:Date.now()};
+  if(ch&&!onizleme)ch.postMessage(msg);try{if(!onizleme)localStorage.setItem('coklu-ortam-5-kasim',JSON.stringify(msg));}catch(e){}
+  try{history.replaceState(null,'','#'+(cur+1));}catch(e){}
+  if(!quiet)send({t:'state',i:cur,k:k});
+  if(sunucu)pvShow();}
 function setStep(i,n,instant){steps[i].forEach(function(st,j){st.els.forEach(function(el){if(instant)el.classList.add('now');el.classList.toggle('h',j>=n);if(instant){void el.offsetWidth;el.classList.remove('now');}});});}
 function autoRun(){clearTimeout(timer);if(k<steps[cur].length&&steps[cur][k].auto){timer=setTimeout(function(){setStep(cur,++k);report();autoRun();},k===0?450:350);}}
-// Magic move: a pinned element with the same id on both slides flies from its old box to its new one
-// (a clone on the stage carries it over while the slides cross-fade).
+// Magic move: a pinned element with the same id on both slides flies from its old box to its new one.
 function magic(a,b){[].forEach.call(b.querySelectorAll('[id]'),function(to){var from=a.querySelector('#'+to.id);if(!from)return;
   var c=from.cloneNode(true);c.removeAttribute('id');c.style.zIndex=5;c.style.transition='none';stage.appendChild(c);
   to.style.visibility='hidden';void c.offsetWidth;
@@ -459,33 +548,78 @@ function magic(a,b){[].forEach.call(b.querySelectorAll('[id]'),function(to){var 
   ['left','top','width','height','borderRadius','boxShadow'].forEach(function(p){c.style[p]=to.style[p]||'0px';});
   var done=function(){if(!c.parentNode)return;to.style.visibility='';c.remove();};
   c.addEventListener('transitionend',function(e){if(e.propertyName==='width')done();});setTimeout(done,2000);});}
-function go(i,full){if(i<0||i>=slides.length)return;clearTimeout(timer);var prev=slides[cur];
+function go(i,full,quiet){if(i<0||i>=slides.length)return;clearTimeout(timer);var prev=slides[cur];
+  if(onizleme)full=true;
   k=full?steps[i].length:0;setStep(i,k,true);var sl=slides[i];
-  if(prev&&prev!==sl&&prev.getAttribute('data-transition')==='magic'&&i===cur+1)magic(prev,sl);
+  if(prev&&prev!==sl&&prev.getAttribute('data-transition')==='magic'&&i===cur+1&&!onizleme)magic(prev,sl);
   if(prev&&prev!==sl)prev.classList.remove('on');
   if(sl.getAttribute('data-transition')==='push'&&!full&&i>cur){sl.classList.add('enter-push');void sl.offsetWidth;}
-  sl.classList.add('on');sl.classList.remove('enter-push');cur=i;report();if(!full)autoRun();}
+  sl.classList.add('on');sl.classList.remove('enter-push');cur=i;report(quiet);if(!full&&!quiet)autoRun();}
 function next(){clearTimeout(timer);if(k<steps[cur].length){setStep(cur,++k);report();autoRun();}else go(cur+1);}
 function back(){clearTimeout(timer);if(k>0&&!(steps[cur][k-1].auto)){setStep(cur,--k,true);report();}else go(cur-1,true);}
-addEventListener('keydown',function(e){var c=e.key;
+// Karşı pencereden gelen durum: aynı slayt ve adıma sessizce geç.
+function apply(i,kk){if(i<0||i>=slides.length)return;clearTimeout(timer);if(i!==cur)go(i,kk>=steps[i].length,true);
+  k=Math.min(kk,steps[i].length);setStep(i,k,true);report(true);}
+function setBlack(on){document.body.classList.toggle('black',on);if(sunucu)document.getElementById('pvStage').classList.toggle('kara',on);}
+function toggleBlack(){var on=!document.body.classList.contains('black');setBlack(on);send({t:'black',on:on});}
+addEventListener('message',function(e){var m=e.data;if(!m||!m.deck)return;
+  if(!sunucu&&!onizleme&&e.source)peer=e.source;
+  if(m.t==='state'){if(m.i!==cur||m.k!==k)apply(m.i,m.k);}
+  else if(m.t==='black')setBlack(m.on);
+  else if(m.t==='hello')report();});
+function openPresenter(){if(sunucu||onizleme)return;if(peer&&!peer.closed){try{peer.focus();}catch(e){}return;}
+  var w=window.open(base+'?sunucu#'+(cur+1),'sunucu-'+'coklu-ortam-5-kasim','popup,width=1440,height=900');if(w)peer=w;}
+// Sunucu penceresi: notlar, sıradaki slayt, süre.
+var notes={};if(sunucu){[].forEach.call(document.getElementById('notlar').content.querySelectorAll('[data-i]'),function(d){notes[d.getAttribute('data-i')]=d;});}
+var pvFrame=null,pvT0=Date.now(),pvPaused=0;
+function pvShow(){var n=notes[cur],nx=cur+1<slides.length,nn=notes[cur+1];
+  document.getElementById('pvNo').textContent=(cur+1)+' / '+slides.length+(n?' · '+n.getAttribute('data-t'):'');
+  var box=document.getElementById('pvNotes');box.innerHTML=n?n.innerHTML:'';
+  var tk=box.querySelectorAll('.tk');[].forEach.call(tk,function(x,j){x.classList.toggle('done',j<k);x.classList.toggle('simdi',j===k);});
+  document.getElementById('pvStep').textContent=steps[cur].length?('tıklama '+k+' / '+steps[cur].length):'tıklama yok';
+  document.getElementById('pvNextT').textContent=nx?(cur+2)+' · '+(nn?nn.getAttribute('data-t'):''):'';
+  var nb=document.getElementById('pvNext');nb.classList.toggle('bitti',!nx);
+  if(nx){var u=base+'?onizleme#'+(cur+2);if(!pvFrame.getAttribute('src'))pvFrame.setAttribute('src',u);else{try{pvFrame.contentWindow.location.replace(u);}catch(e){pvFrame.setAttribute('src',u);}}}}
+if(sunucu){
+  pvFrame=document.querySelector('#pvNext iframe');
+  var el=document.getElementById('pvEl'),clock=document.getElementById('pvClock'),left=document.getElementById('pvLeft'),T=1800;
+  var mmss=function(t){return (t<600?'0':'')+Math.floor(t/60)+':'+(t%60<10?'0':'')+(t%60);};
+  var tick=function(){var t=Math.floor(((pvPaused||Date.now())-pvT0)/1000);el.textContent=mmss(t);
+    el.classList.toggle('az',t>=T-180&&t<T);el.classList.toggle('bitti',t>=T);el.classList.toggle('dur',!!pvPaused);
+    left.textContent=t<T?'kalan '+mmss(T-t):'süre doldu';
+    var d=new Date();clock.textContent=(d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();};
+  setInterval(tick,500);tick();
+  el.addEventListener('click',function(){if(pvPaused){pvT0+=Date.now()-pvPaused;pvPaused=0;}else pvPaused=Date.now();tick();});
+  document.querySelector('.pv-btn').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var kk=b.getAttribute('data-k');
+    if(kk==='next')next();else if(kk==='prev')back();else if(kk==='black')toggleBlack();else if(kk==='reset'){pvT0=Date.now();pvPaused=0;tick();}b.blur();});
+  var nf=24;addEventListener('keydown',function(e){if(e.key==='+'||e.key==='=')nf=Math.min(44,nf+2);else if(e.key==='-')nf=Math.max(16,nf-2);else return;document.getElementById('pvNotes').style.setProperty('--nf',nf+'px');});
+}
+// Önizleme kopyası: adres değişince o slayta geçer (tüm adımlar açık).
+addEventListener('hashchange',function(){if(!onizleme)return;var n=parseInt(location.hash.slice(1),10);if(n>0)go(n-1,true,true);});
+addEventListener('keydown',function(e){var c=e.key;if(onizleme)return;
   if(c==='ArrowRight'||c==='ArrowDown'||c==='PageDown'||c===' '||c==='Enter'||c==='n'){e.preventDefault();next();}
   else if(c==='ArrowLeft'||c==='ArrowUp'||c==='PageUp'||c==='Backspace'||c==='p'){e.preventDefault();back();}
   else if(c==='Home')go(0);else if(c==='End')go(slides.length-1,true);
-  else if(c==='f'||c==='F'){if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen();}});
-addEventListener('click',function(e){if(e.button===0)next();});
+  else if(c==='f'||c==='F'){if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen();}
+  else if(c==='b'||c==='B'||c==='.')toggleBlack();
+  else if(c==='s'||c==='S')openPresenter();});
+// Sunucu penceresinde yalnızca slayt kutusuna tıklamak ilerletir.
+function onStage(e){return !sunucu||!!e.target.closest('#pvStage');}
+addEventListener('click',function(e){if(e.button===0&&!onizleme&&onStage(e))next();});
 // Phones: swipe left/right to move; a tap still counts as a click.
 var tx=null,ty=0;
 addEventListener('touchstart',function(e){tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
-addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;
+addEventListener('touchend',function(e){if(tx===null||onizleme)return;var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;
   if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){e.preventDefault();if(dx<0)next();else back();}});
-addEventListener('contextmenu',function(e){e.preventDefault();back();});
-// Commands from the notes window arrive on both channels; run each id once.
-var seen={};function cmd(d){if(!d||!d.cmd||seen[d.id])return;seen[d.id]=1;
+addEventListener('contextmenu',function(e){if(!onStage(e)||onizleme)return;e.preventDefault();back();});
+// Commands from the separate notes page arrive on both channels; run each id once.
+var seen={};function cmd(d){if(!d||!d.cmd||seen[d.id]||onizleme)return;seen[d.id]=1;
   if(d.cmd==='next')next();else if(d.cmd==='back')back();else if(d.cmd==='go')go(d.i,true);else if(d.cmd==='hello')report();}
 if(ch)ch.onmessage=function(e){cmd(e.data);};
 addEventListener('storage',function(e){if(e.key==='coklu-ortam-5-kasim-cmd'&&e.newValue)cmd(JSON.parse(e.newValue));});
 var idle;function wake(){document.body.classList.remove('idle');clearTimeout(idle);idle=setTimeout(function(){document.body.classList.add('idle');},2000);}
 addEventListener('mousemove',wake);wake();
-var start=parseInt((location.hash||'').slice(1),10);go(start>=1&&start<=slides.length?start-1:0);
+var start=parseInt((location.hash||'').slice(1),10);go(start>=1&&start<=slides.length?start-1:0,onizleme,onizleme);
+if(sunucu)send({t:'hello'});
 })();
 </script></body></html>
