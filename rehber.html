@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mayer ve 15 İlke · Çalışma Rehberi</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400..800;1,400&display=swap">
+<style>
+:root{
+  --bg:#FBFBFD; --card:#FFFFFF; --fg:#1D1D1F; --mut:#6E6E73; --line:#E5E5EA;
+  --duygu:#C2410C; --duygu-bg:#FFF1EA; --erisim:#0066CC; --erisim-bg:#EAF2FF;
+  --no:#C62F2F; --soft:#F5F5F7; --ink:#0B0B0F; --ink-fg:#F5F5F7;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0B0B0F; --card:#17171C; --fg:#F5F5F7; --mut:#A1A1A6; --line:#2C2C33;
+  --duygu:#FF7A45; --duygu-bg:#2A1710; --erisim:#2997FF; --erisim-bg:#0F1F33;
+  --no:#FF6B6B; --soft:#1F1F25; --ink:#1F1F25; --ink-fg:#F5F5F7; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0B0B0F; --card:#17171C; --fg:#F5F5F7; --mut:#A1A1A6; --line:#2C2C33;
+  --duygu:#FF7A45; --duygu-bg:#2A1710; --erisim:#2997FF; --erisim-bg:#0F1F33;
+  --no:#FF6B6B; --soft:#1F1F25; --ink:#1F1F25; --ink-fg:#F5F5F7; color-scheme:dark }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding-block:32px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{margin-bottom:40px}
+.kicker{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600;margin:0 0 10px}
+h1{font-size:clamp(34px,7vw,52px);line-height:1.05;letter-spacing:-.03em;font-weight:700;margin:0 0 16px;text-wrap:balance}
+.lead{font-size:20px;color:var(--mut);margin:0;max-width:60ch}
+h2{font-size:clamp(26px,5vw,34px);letter-spacing:-.02em;line-height:1.15;margin:56px 0 8px;text-wrap:balance}
+h2 small{display:block;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600;margin-bottom:8px}
+h3{font-size:19px;margin:28px 0 8px;letter-spacing:-.01em}
+p{margin:0 0 14px;max-width:66ch}
+ul,ol{padding-left:22px;margin:0 0 14px;max-width:64ch}
+li{margin-bottom:6px}
+.box{border-radius:16px;padding:16px 20px;margin:14px 0}
+.box.d{background:var(--duygu-bg);border-left:4px solid var(--duygu)}
+.box.e{background:var(--erisim-bg);border-left:4px solid var(--erisim)}
+.box.soft{background:var(--soft)}
+.box p:last-child,.box ul:last-child{margin-bottom:0}
+.say{background:var(--soft);border-radius:16px;padding:16px 20px;margin:14px 0;font-size:17px}
+.say b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.film{background:var(--ink);color:var(--ink-fg);border-radius:16px;padding:16px 20px;margin:14px 0;font-size:16px}
+.film b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--duygu);margin-bottom:6px}
+.film p{color:var(--ink-fg)}.film p:last-child{margin:0}
+table{border-collapse:collapse;width:100%;margin:14px 0 20px;font-size:16px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}
+.tw{overflow-x:auto}
+.g1{color:var(--no);font-weight:700}.g2{font-weight:700}.g3{color:var(--erisim);font-weight:700}
+.slide{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px 22px;margin:14px 0}
+.slide .no{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}
+.slide h3{margin:4px 0 10px}
+.slide p:last-child,.slide .say:last-child{margin-bottom:0}
+details{border:1px solid var(--line);border-radius:14px;padding:12px 18px;margin:10px 0;background:var(--card)}
+summary{cursor:pointer;font-weight:600;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"+";display:inline-block;width:20px;color:var(--mut);font-weight:700}
+details[open] summary::before{content:"–"}
+details p{margin-top:10px}
+.cheat{counter-reset:c;padding:0;margin:0 0 14px;list-style:none;max-width:none}
+.cheat li{counter-increment:c;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px 14px 56px;position:relative;margin-bottom:10px;font-size:18px;font-weight:500}
+.cheat li::before{content:counter(c);position:absolute;left:18px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--fg);color:var(--bg);font-size:13px;font-weight:700;display:grid;place-items:center}
+.src{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin:10px 0}
+.src .t{font-weight:700;margin-bottom:4px}
+.src .t span{font-weight:500;color:var(--mut);font-size:14px;margin-left:8px}
+.src p{margin:0;font-size:16px}
+footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font-size:14px;color:var(--mut)}
+a{color:var(--erisim)}
+@media (max-width:480px){ body{font-size:16px} .cheat li{font-size:16px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="kicker">Çoklu Ortam Tasarımı · 5 Kasım 2026 · Prof. Dr. Özden Demirkan</p>
+  <h1>Mayer ve 15 İlke: Çalışma Rehberi</h1>
+  <p class="lead">Bu rehber, 5 Kasım 2026'daki "Mayer ve 15 İlke" sunumunu dinleyip konuyu biraz daha kurcalamak isteyenler için yazıldı. Kuram tek bir resimle anlatılıyor: ders dinlerken not tutan bir öğrenci ve dar bir defter sayfası. On beş ilkenin her birinin gündelik hayattan ve İngilizce dersinden bir örneği var; çoğunun adını zaten biliyorsunuz (pre-teach vocabulary, TPR, PPP). Sayı ve istatistik yok. Okuma süresi 25 dakika.</p>
+</header>
+
+<div class="box e"><p><b>Nasıl kullanılır:</b> Önce Bölüm 1'i okuyun; kuramın tamamı orada, bir sayfa. Sonra Bölüm 2'deki tabloya bakın; on beş ilke tek bakışta. Bölüm 4 sunumu slayt slayt hatırlatır, sunumu açıp yanında okuyabilirsiniz. Bölüm 7'deki on soruyu kendinize sorup cevabı açmadan yanıtlamayı deneyin. Kaynakları en sona bıraktık; önce kuramı, sonra kaynağı.</p></div>
+
+<h2><small>Bölüm 1</small>Kuram, bir resimle</h2>
+<h3>Mayer kim?</h3>
+<p>Richard Mayer, Kaliforniya Üniversitesi Santa Barbara'da eğitim psikoloğu. Otuz yıldır tek bir soru soruyor: İnsanlar kelime ve resimden nasıl öğrenir? Görüş yazmıyor, deney yapıyor: aynı dersi iki biçimde anlatıyor, iki gruba gösteriyor, test ediyor. Yüzlerce kez. Sonuçları Multimedia Learning kitabında topladı; her baskıda ilke sayısı arttı (2001'de 7, 2009'da 12, 2020'de 15), çünkü ilkeler masa başında düşünülmedi, deneyde bulundu.</p>
+<h3>Neden önemli?</h3>
+<p>Öğretmen olarak ürettiğiniz her şey (ders videosu, slayt, çalışma kâğıdı, e-içerik) kelime artı resimdir. Mayer "teknoloji ne yapabilir" yerine "insan zihni nasıl öğrenir" diye soruyor. Sinema sınıfa girdi, televizyon girdi, bilgisayar girdi; her seferinde devrim beklendi, olmadı. Çünkü soru yanlıştı: araç değil, zihin.</p>
+<h3>Üç varsayım, tek resim</h3>
+<ul>
+  <li><b>İki kanal:</b> Göz ve kulak ayrı yollar. Tahtadaki resim gözden, öğretmenin sesi kulaktan girer. Dinleme etkinliği kulağı, okuma parçası gözü çalıştırır.</li>
+  <li><b>Sınırlı kapasite:</b> Sayfa dar. Bir derste on yeni kelime: ertesi gün üçü kalır. Öğrencinin tembelliği değil, zihnin yapısı.</li>
+  <li><b>Aktif işleme:</b> Öğrenci kayıt cihazı değil, not tutan biri: neyi yazacağını seçer, başlıklar altında düzenler, bildikleriyle bağlar.</li>
+</ul>
+<div class="film"><b>Resim</b><p>Dersi dinlerken not tutan bir öğrenci: iki kanaldan gelen malzeme, dar bir defter sayfası. Öğretmenin işi ona iyi malzeme vermek ve sayfasını gereksiz şeylerle doldurmamak. Rehberin geri kalanında ne zaman "sayfa" dense bu defter sayfası kastediliyor.</p></div>
+<h3>Model: soldan sağa</h3>
+<p>Kelimeler ve resimler (öğretmenin ürettiği) kulağa ve göze gelir. Öğrenci önce <b>seçer</b> (öğretmenin her cümlesini yazmaz), sonra <b>düzenler</b> (kelimelerden sözel bir model, görüntülerden resimsel bir model kurar; ikisini bağlar), sonra <b>bütünleştirir</b> (bildikleriyle birleştirir; sunumda alan derinliği kavramı telefonun portre moduyla bağlandı, o an olan buydu). Öğrenme bu son adımda olur.</p>
+<h3>Sayfada üç tür iş</h3>
+<ul>
+  <li><span class="g1">Gereksiz iş</span>: kötü tasarımın yarattığı iş. Ders kitabı sayfasındaki süs resmi, konu dışı "Did you know?" kutusu. <b>5 ilke azaltır.</b></li>
+  <li><span class="g2">Zorunlu iş</span>: konunun kendi zorluğu; present perfect'in kendisi. <b>3 ilke yönetir.</b></li>
+  <li><span class="g3">Üretici iş</span>: öğrencinin anlamak için verdiği gönüllü çaba; kendi cümlesini kurması. <b>7 ilke artırır.</b></li>
+</ul>
+<div class="box d"><p><b>Tek cümlede kuram:</b> Sayfa dar; gereksizi kaldır, zoru taşınabilir yap, öğrenciyi çalıştır.</p></div>
+
+<h2><small>Bölüm 2</small>On beş ilke, birer örnekle: gündelik hayat ve sınıf</h2>
+<div class="tw"><table>
+<tr><th>#</th><th>İlke</th><th>Tek cümle</th><th>Gündelik hayattan ve sınıftan</th></tr>
+<tr><td class="g1">1</td><td>Tutarlılık · coherence</td><td>İlgisiz kelime, resim, sesi çıkar.</td><td>Tarif videosundaki fon müziği; sayfadaki süs resmi, "Did you know?" kutusu. Çehov'un tüfeği.</td></tr>
+<tr><td class="g1">2</td><td>İşaretleme · signaling</td><td>Önemli olanı göster.</td><td>Google Haritalar: şehir gri, rota mavi. Tahtada hedef yapı renkli.</td></tr>
+<tr><td class="g1">3</td><td>Artıklık · redundancy</td><td>Söylediğini bir de ekrana basma.</td><td>Slaytta paragraf varsa sınıf okur, dinlemez. (Dil dersi istisnası: Bölüm 3.)</td></tr>
+<tr><td class="g1">4</td><td>Uzamsal yakınlık · spatial contiguity</td><td>Kelime resmin yanında olsun.</td><td>IKEA kılavuzunda vida numarası parçanın üstünde. Flashcard.</td></tr>
+<tr><td class="g1">5</td><td>Zamansal yakınlık · temporal contiguity</td><td>Resim ve kelime aynı anda.</td><td>Tarif videosunda "şimdi tuz" derken tuz atılır. Elma resmi ile "apple" aynı anda.</td></tr>
+<tr><td class="g2">6</td><td>Bölümleme · segmenting</td><td>Parçalara böl, öğrenci "devam" desin.</td><td>Tarif adım adım, kılavuz sayfa sayfa; Part A, Part B.</td></tr>
+<tr><td class="g2">7</td><td>Ön eğitim · pre-training</td><td>Önce terimleri öğret.</td><td>Yeni telefonda önce düğmeler, sonra kurulum. Pre-teach vocabulary.</td></tr>
+<tr><td class="g2">8</td><td>Kiplik · modality</td><td>Hareketli görüntüyü yazıyla değil sesle anlat.</td><td>Navigasyon yolu yazmaz, söyler: göz yolda, kulak boş. Sunumdaki hareketli fon deneyi.</td></tr>
+<tr><td class="g3">9</td><td>Çoklu ortam · multimedia</td><td>Kelime + resim, yalnızca kelimeden iyi.</td><td>Fotoğraflı tarif yazılı tariften iyi. Flashcard. Sunumun açılış deneyi.</td></tr>
+<tr><td class="g3">10</td><td>Kişiselleştirme · personalization</td><td>"Sen" diye, sohbet gibi anlat.</td><td>"Şimdi kabloyu tak" diyen kılavuz; "Imagine you are at the airport…"</td></tr>
+<tr><td class="g3">11</td><td>Ses · voice</td><td>İnsan sesi, makine sesinden iyi.</td><td>Sesli kitap, dinleme kaydı: gerçek insan.</td></tr>
+<tr><td class="g3">12</td><td>Görüntü · image</td><td>Öğretmenin yüzü tek başına öğretmez.</td><td>Tarif videosunda şefin yüzü değil, tencere. "Hoca ekranda görünsün" otomatik iyi değil.</td></tr>
+<tr><td class="g3">13</td><td>Bedenleşme · embodiment</td><td>Anlatıcı jest yapsın, göstersin.</td><td>Elle gösteren usta; TPR: "jump" derken zıplamak.</td></tr>
+<tr><td class="g3">14</td><td>Sarmalama · immersion</td><td>VR tek başına öğretmez.</td><td>VR müze turu, ekrandan iyi değil.</td></tr>
+<tr><td class="g3">15</td><td>Üretici etkinlik · generative activity</td><td>Özetlet, anlattır, kurdurt.</td><td>Tarifi izlemek değil, yemeği yapmak. PPP'nin production aşaması.</td></tr>
+</table></div>
+<p>Son üçü (13, 14, 15) 2020'deki üçüncü baskıyla eklendi; eski kaynaklarda ve bazı derslerde on iki ilke görürsünüz. Yanlış değil, baskı farkı.</p>
+
+<h2><small>Bölüm 3</small>Sunumdaki örnekler, biraz daha açılmış</h2>
+<div class="film"><b>Açılış deneyi · alan derinliği · slayt 2 ve 3</b><p>Sunum fotoğrafçılıktan bir kavramla başladı. Önce yalnızca metin ("f sayısı küçülünce açıklık büyür"; kafa karışık), sonra şema (diyafram açık: dar net bölge, arka plan bulanık; kısık: her şey net), sonra soru: "Arka plan bulanık olsun istiyorsanız diyaframı açar mısınız, kısar mısınız?" Cevap: açarsınız; telefondaki portre modu bunu yazılımla taklit eder. Sinemada kalabalıkta tek net yüz de aynı şey: yönetmen "buraya bak" diyor; bulanıklık süs değil, işaret. Deneyin amacı: aynı kavramı önce kelimeden, sonra kelime artı resimden öğrenmenin farkını yaşamak. Bu, çoklu ortam ilkesinin kendisi.</p></div>
+<div class="film"><b>Çehov'un tüfeği (1889) · slayt 11</b><p>"One must never place a loaded rifle on the stage if it isn't going to go off." Ders kitabı sayfasındaki süs resmi de bir tüfek: patlamayacaksa, yani konuya hizmet etmeyecekse, asılmaz.</p></div>
+<div class="film"><b>Ders kitabı sayfası · slayt 11</b><p>Ünite "At the airport": uçak, bavul, pasaport resimleri hizmet ediyor; köşedeki gülen güneş, konfeti, "Did you know? The longest flight is…" kutusu çekici ayrıntı. Öğrenci okur, eğlenir, hedef kelimeler sayfadan düşer. Dersin okuma listesindeki Sundararajan ve Adesope (2020) onlarca deneyi topladı: çekici ayrıntı öğrenmeyi düşürür.</p></div>
+<div class="film"><b>Bir kelime dersinde üç ilke · slayt 12</b><p>"Üç kelimeye dikkat edin" (işaretleme); flashcard'da resim ve kelime aynı kartta (uzamsal yakınlık); elma resmini kaldırırken "apple" demek, TPR (zamansal yakınlık). İyi öğretmen bunu zaten yapıyor; Mayer sezgiyi deneyle doğruladı ve ad verdi. Adı olan şey kontrol listesine yazılabilir.</p></div>
+<div class="film"><b>Hareketli fon deneyi · slayt 13</b><p>Sınıf ilkeyi yaşadı: bir tıkla fon hareketlendi, yazı aynı kaldı, okumak zorlaştı; bir tıkla fon durdu, rahatlama. Hareketli bir sunum şablonu seçtiğinizde sınıfa yaptığınız şey budur. Kiplik ve tutarlılık aynı anda çalıştı.</p></div>
+<div class="film"><b>Pre-teach vocabulary · slayt 13</b><p>Ön eğitim ilkesinin ta kendisi. Dil öğretimi bunu otuz yıldır uyguluyor; Mayer aynı şeyi fren sistemi ve yıldırım deneylerinde laboratuvarda buldu.</p></div>
+<div class="film"><b>EBA dinleme videosu · slayt 15</b><p>"At the station", hedef: tren saatini anlamak. Sık yapılan ile düzeltilmiş sürüm yan yana: dört bölüm (bölümleme), pre-teach (ön eğitim), ilk dinlemede yalnızca ses ve metin ikinci dinlemede (kiplik, artıklık), kelime resmin üstünde ve anında (uzamsal ve zamansal yakınlık), "you are at the station" ve insan sesi (kişiselleştirme, ses), son görev: diyaloğu arkadaşınla kendi şehrin için kur ve kaydet (üretici etkinlik). Altı karar, on ilke, sıfır ek bütçe.</p></div>
+<div class="film"><b>Dil dersi istisnası · slayt 16</b><p>Artıklık ilkesi "anlatılanı ekrana yazma" der; ama hedef dildeki altyazı ve dinleme metni çoğu zaman öğrenilmek istenen şeyin kendisi. Dil öğrenme araştırmaları hedef dildeki altyazının dinlediğini anlamaya yardım ettiğini gösteriyor; Mayer'in deneyleri ise ana dilde konu öğrenme üzerine. İlke yanlış değil, koşullu: sıra önemli (ilk dinlemede kulak, ikincide yazı). Erişilebilirlik için konan altyazı ayrı bir konu, her zaman kalır.</p></div>
+
+<h2><small>Bölüm 4</small>Slayt slayt: sunumda ne anlatıldı</h2>
+<div class="slide"><span class="no">Slayt 1 · Kapak</span><h3>Mayer ve 15 İlke</h3><p>Tek kuram ve on beş ilkesi. Basitten karmaşığa: önce küçük bir deney, sonra Mayer kim, kuram ne diyor, sonra ilkeler ve sınıftan örnekler. Çoğunu zaten yapıyorsunuz; sunum adını koyuyor.</p></div>
+<div class="slide"><span class="no">Slayt 2 · Deney</span><h3>Alan derinliği, önce yalnızca kelimeyle</h3><p>Soldaki metin 20 saniye okundu; "arka plan bulanık olsun istiyorsam diyaframı ne yapmalıyım?" sorusuna sınıf tereddüt etti. Sonra şema geldi, sonra cevap: açarsınız, f/1.8; portre modu bunu taklit eder. "Kelimelerden mi öğrendiniz, resimden mi?" Çoklu ortam ilkesi. Asıl soru: neden, ve her resim işe yarar mı? Süs de resim.</p></div>
+<div class="slide"><span class="no">Slayt 3 · Somut örnek</span><h3>Her gün yapıyorsunuz</h3><p>Portre modu: telefon diyafram açmayı yazılımla taklit eder, saç kenarlarını bazen yanlış keser. Sinema: kalabalıkta tek net yüz; bulanıklık süs değil, işaret. Köprü: önce kelime, sonra şema, sonra tanıdık örnek; modelde buna bütünleştirme denecek.</p></div>
+<div class="slide"><span class="no">Slayt 4 · Mayer kimdir</span><h3>Otuz yıldır tek soru</h3><p>Eğitim psikoloğu, Santa Barbara. Görüş değil deney. Kitap üç baskı: 7, 12, 15 ilke. İlkeler düşünülmedi, bulundu.</p></div>
+<div class="slide"><span class="no">Slayt 5 · Neden önemli</span><h3>İki soru</h3><p>Her ders materyali bir çoklu ortam mesajı. "Teknoloji ne yapabilir" yerine "zihin nasıl öğrenir". Stüdyoda 4K kamera ve yeşil perde var; zor soru, öğrencinin kafasında ne olacağı.</p></div>
+<div class="slide"><span class="no">Slayt 6 · Üç varsayım</span><h3>Not tutan öğrenci</h3><p>İki kanal (tahtadaki resim göz, öğretmenin sesi kulak), sınırlı kapasite (derste on kelime, ertesi gün üçü), aktif işleme (öğrenci kayıt cihazı değil, not tutan biri). Dar defter sayfası, iki kanal, not tutan öğrenci.</p></div>
+<div class="slide"><span class="no">Slayt 7 · Model</span><h3>Soldan sağa</h3><p>Solda öğretmenin ürettiği: kelimeler, resimler. Kulağa ve göze gelir. Birinci iş seçme: not tutan öğrenci her cümleyi yazmaz. İkinci iş düzenleme: kelimelerden bir model, görüntülerden bir model; ikisi bağlanır. Üçüncü iş bütünleştirme: bildikleriyle birleşir; sınıf az önce alan derinliğini portre moduyla bağlamıştı. Öğrenme burada olur.</p></div>
+<div class="slide"><span class="no">Slayt 8 · Üç tür iş</span><h3>5 + 3 + 7</h3><p>Gereksiz iş (sayfadaki süs, "Did you know?"), zorunlu iş (present perfect'in kendisi), üretici iş (öğrencinin kendi cümlesi). On beş ilke: beş azalt, üç yönet, yedi artır.</p></div>
+<div class="slide"><span class="no">Slayt 9 · Harita</span><h3>On beş ilke tek bakışta</h3><p>Üç kutu, on beş ad. Adlar başta yabancı gelir; her biri bir İngilizce dersi örneğiyle açıldı. Bu slayt sunumun sonunda kontrol listesi olarak geri geldi; Bölüm 2'deki tablo aynı listenin genişletilmiş hâli.</p></div>
+<div class="slide"><span class="no">Slayt 10 · Grup 1</span><h3>Sayfadan kaldır</h3><p>Tutarlılık (süs resmi, konu dışı kutu), işaretleme (tahtada renkli kelime), artıklık (slaytta paragraf varsa sınıf okur, dinlemez; dil istisnası sonra), uzamsal yakınlık (flashcard), zamansal yakınlık (resmi gösterirken kelimeyi söyle).</p></div>
+<div class="slide"><span class="no">Slayt 11 · Tutarlılık</span><h3>Konfeti, ders kitabı sayfası ve Çehov</h3><p>Solda konunun öğeleri; sağda "Ödül aldık", patlamış mısır, kırmızı halı. Mayer buna çekici ayrıntı diyor; Sundararajan ve Adesope onlarca deneyi topladı: öğrenmeyi düşürür. Sınıftan: "At the airport" sayfasında uçak ve pasaport hizmet eder; köşedeki gülen güneş ve "Did you know?" kutusu çekici ayrıntı. Çehov: tüfek patlamayacaksa asılmaz. Yapay zekâ araçları sağdakini çok seviyor; ayıklamak öğretmene kalıyor.</p></div>
+<div class="slide"><span class="no">Slayt 12 · Kelime dersi</span><h3>İyi öğretmen bunu zaten yapıyor</h3><p>İşaretleme: "üç kelimeye dikkat". Uzamsal yakınlık: flashcard. Zamansal yakınlık: elma resmi ile "apple" aynı anda; TPR. Mayer sezgiyi deneyle doğruladı ve ad verdi; adı olan şey kontrol listesine yazılabilir.</p></div>
+<div class="slide"><span class="no">Slayt 13 · Grup 2 · deney</span><h3>Zoru taşınabilir yap; sonra fon hareketlendi</h3><p>Bölümleme (Part A, Part B), ön eğitim (pre-teach vocabulary), kiplik (hareketli görüntüyü sesle anlat). Kiplik "yazı kötü" demek değil; hareketli görüntü üstüne yazı kötü. Deney: fon hareketlendi (lekeler, kayan çizgiler, "SON DAKİKA" bandı), yazı değişmedi, okumak zorlaştı; fon durunca rahatlama. İki ilke birden: kiplik ve tutarlılık.</p></div>
+<div class="slide"><span class="no">Slayt 14 · Grup 3</span><h3>Öğrenci istesin</h3><p>Çoklu ortam (flashcard), kişiselleştirme ("Imagine you are…"), ses (gerçek insan kaydı), görüntü (yüz şart değil), bedenleşme (TPR), sarmalama (VR şart değil), üretici etkinlik (PPP'nin production aşaması). Son üçü 2020'de eklendi.</p></div>
+<div class="slide"><span class="no">Slayt 15 · EBA videosu</span><h3>İngilizce dinleme videosu, altı karar</h3><p>"At the station", hedef: tren saatini anlamak. Sol sütun sık yapılan, sağ sütun düzeltilmiş: dört bölüm, pre-teach, ilk dinlemede yalnızca ses, kelime resmin üstünde ve anında, "you are at the station" ve insan sesi, son görev: diyaloğu kendi şehrin için kur ve kaydet. Altı karar, on ilke, sıfır ek bütçe.</p></div>
+<div class="slide"><span class="no">Slayt 16 · Sınırlar</span><h3>Kural değil, koşullu</h3><p>Acemide işler, ileri düzeyde tersine dönebilir (A1 ile B2 aynı tasarımı istemez). Dil dersi istisnası: hedef dildeki altyazı ve dinleme metni öğrenilmek istenen şeyin kendisi; sıra önemli. Model soğuk: duygu yok; Moreno ile Plass ve Kaplan ekledi. Köprü: yapay zekâ süsü bedavaya getirdi; hangi ilkeyi çiğnediğini bilmek öğretmenin işi. 3 Aralık'taki "Üretken Yapay Zekâ ve Çoklu Ortam" sunumunun konusu.</p></div>
+<div class="slide"><span class="no">Slayt 17 · Tartışma</span><h3>Bu sunum hangi ilkeleri çiğnedi?</h3><p>Sunumun kendisine ilkelerle bakma alıştırması. İpuçları: söylenen yazıldı mı (artıklık, sınırda), etiketler yan yana mıydı (iyi), dinleyiciye bir şey yaptırıldı mı (deney ve bu soru; ama "yazın, çizin" denmedi). Sonuç: kuram kendi hatanızı görmenizi sağlar; slayt 9'daki liste bir kontrol listesidir. Aynı soruyu kendi bir ders materyalinize sorun.</p></div>
+<div class="slide"><span class="no">Slayt 18 · Kaynakça</span><h3>Üçü asıl</h3><p>Mayer'in kitabı, özet makalesi, el kitabı. Sundararajan ve Adesope ders okumasından. Paivio, Baddeley, Sweller varsayımların sahipleri. Moreno, Plass ve Kaplan sınırlar. Ayrıntı Bölüm 8'de.</p></div>
+
+<h2><small>Bölüm 5</small>Sık sorulan sorular</h2>
+<details><summary>"Kuram ile ilke farkı ne?"</summary><p>Kuram zihnin nasıl çalıştığını söyler: iki kanal, dar sayfa, not tutan öğrenci. İlkeler bu kurama dayanan tasarım kuralları. Kuram tek, ilke on beş.</p></details>
+<details><summary>"Bilişsel yük kuramıyla farkı ne?"</summary><p>Akraba. Sweller'ın kuramı sayfanın darlığına ve üç tür yüke odaklanır; Mayer bunu çoklu ortama, yani kelime artı resme uygular ve iki kanal fikrini ekler.</p></details>
+<details><summary>"Artıklık ilkesi dinleme metnini ekrana koymayı yasaklıyor mu? Altyazı?"</summary><p>Mayer'in deneyleri ana dilde, konu öğrenme üzerine. Dil dersinde hedef dildeki yazı çoğu zaman öğrenilmek istenen şeyin kendisi; araştırmalar hedef dildeki altyazının dinlediğini anlamaya yardım ettiğini gösteriyor. İlke yanlış değil, koşullu: sıra önemli; ilk dinlemede kulak, ikincide yazı. Erişilebilirlik için konan altyazı ayrı, her zaman kalır.</p></details>
+<details><summary>"Bazı kaynaklar neden on iki ilke diyor?"</summary><p>2009 baskısında on iki ilke vardı. 2020 üçüncü baskı üç ilke ekledi: bedenleşme, sarmalama, üretici etkinlik. Baskı farkı.</p></details>
+<details><summary>"Bu ilkeler her öğrenci için geçerli mi?"</summary><p>Hayır, koşullu. En çok konuya yeni başlayanda işler; ileri düzeyde etki küçülür, bazen tersine döner. Mayer buna sınır koşulları diyor. A1 ile B2 aynı tasarımı istemez.</p></details>
+<details><summary>"Duygu nerede?"</summary><p>Mayer'in modeli soğuk; şemada duygu yok. Öğrencisi Moreno bilişsel-duyuşsal kuramla (CATLM), Plass ve Kaplan bütünleşik modelle (ICALM) ekledi. Mayer de üçüncü baskıda "üretici işi artır" grubunu yediye çıkararak kısmen cevap verdi.</p></details>
+<details><summary>"Görüntü ilkesi ile bedenleşme çelişmiyor mu?"</summary><p>Görüntü: öğretmenin yüzünü ekrana koymak tek başına öğretmez. Bedenleşme: koyduysanız insan gibi davransın, jest yapsın. "Yüz koy" değil, "koyarsan canlı olsun".</p></details>
+<details><summary>"Pre-teach vocabulary ile ön eğitim aynı şey mi?"</summary><p>Evet, aynı mantık: ana anlatımdan önce temel terimleri ve parçaları tanıtmak, zorunlu işi zamana yaymak. Mayer bunu fren sistemi ve yıldırım deneylerinde buldu; dil öğretimi bunu zaten uyguluyordu.</p></details>
+<details><summary>"Yapay zekâ sesi insan sesinden kötü mü hâlâ?"</summary><p>Mayer'in ses deneyleri eski sentetik seslerle yapıldı. Yeni yapay zekâ sesleri ilkeyi yeniden test ettiriyor; kesin sonuç yok. 3 Aralık'taki Üretken Yapay Zekâ sunumunun konularından biri.</p></details>
+<details><summary>"Bu kuramı kendi dersimde nasıl kullanırım?"</summary><p>Bir materyalinizi alın (slayt, çalışma kâğıdı, video) ve Bölüm 2'deki tabloyu kontrol listesi gibi üstünden geçin. Çoğu zaman üç soru yeter: Sayfada konuya hizmet etmeyen ne var (tutarlılık)? Kelime resmin yanında ve aynı anda mı (yakınlık)? Öğrenci sonunda kendi bir şey üretiyor mu (üretici etkinlik)?</p></details>
+
+<h2><small>Bölüm 6</small>Akılda kalacak sekiz cümle</h2>
+<ol class="cheat">
+  <li>Mayer otuz yıldır tek soru soruyor: insanlar kelime ve resimden nasıl öğrenir?</li>
+  <li>Teknoloji ne yapabilir değil, zihin nasıl öğrenir.</li>
+  <li>Üç varsayım: iki kanal, dar sayfa, not tutan öğrenci. Seç, düzenle, bütünleştir.</li>
+  <li>Sayfada üç iş: gereksizi azalt (5), zorunluyu yönet (3), üreticiyi artır (7).</li>
+  <li>Tutarlılık: sayfadaki süs resmi de bir tüfek; patlamayacaksa asılmaz (Çehov).</li>
+  <li>İyi öğretmen bunu zaten yapıyor: pre-teach, flashcard, TPR, production. Mayer ad verdi.</li>
+  <li>Dil dersi istisnası: hedef dildeki yazı artıklık değil, hedefin kendisi; sıra önemli.</li>
+  <li>Öğrenci kendi cümlesini kursun: son görev, diyaloğu kendi şehrin için kur ve kaydet.</li>
+</ol>
+
+<h2><small>Bölüm 7</small>Kendinizi sınayın</h2>
+<p>Önce cevabı açmadan deneyin.</p>
+<details><summary>1. Mayer'in tek sorusu?</summary><p>İnsanlar kelime ve resimden nasıl öğrenir?</p></details>
+<details><summary>2. Üç varsayım?</summary><p>İki kanal, sınırlı kapasite, aktif işleme.</p></details>
+<details><summary>3. Not tutan öğrencinin üç işi?</summary><p>Seçme, düzenleme, bütünleştirme.</p></details>
+<details><summary>4. Üç tür iş ve ilke sayıları?</summary><p>Gereksiz (5 azalt), zorunlu (3 yönet), üretici (7 artır).</p></details>
+<details><summary>5. Gereksiz işi azaltan beş ilke?</summary><p>Tutarlılık, işaretleme, artıklık, uzamsal yakınlık, zamansal yakınlık.</p></details>
+<details><summary>6. Zorunlu işi yöneten üç ilke ve İngilizce dersindeki adı?</summary><p>Bölümleme, ön eğitim (pre-teach vocabulary), kiplik.</p></details>
+<details><summary>7. Üçüncü baskıyla eklenen üç ilke?</summary><p>Bedenleşme (TPR), sarmalama, üretici etkinlik (production).</p></details>
+<details><summary>8. Çekici ayrıntı ne, hangi ilke?</summary><p>İlginç ama konu dışı ekleme; tutarlılık ilkesi. "Did you know?" kutusu, konfeti.</p></details>
+<details><summary>9. Dil dersi istisnası ne?</summary><p>Hedef dildeki altyazı ve dinleme metni artıklık değil, öğrenilmek istenen şey; ilke koşullu, sıra önemli.</p></details>
+<details><summary>10. Modelin "soğuk" olması ne demek, kim düzeltti?</summary><p>Şemada duygu ve motivasyon yok. Moreno (CATLM) ve Plass ile Kaplan (ICALM) ekledi.</p></details>
+
+<h2><small>Bölüm 8</small>Dokuz kaynak; üçü asıl</h2>
+<p>Asıl kaynak Mayer'in kendisi: kitap, özet makale, el kitabı. Gerisi destek. Vaktiniz kısıtlıysa sırayla: Mayer (2024) özet makalesi, kitabın içindekiler sayfası, Sundararajan ve Adesope (2020) özeti.</p>
+<h3>Başlamak için üç şey (15 dakika)</h3>
+<ol>
+  <li><b>Mayer (2024), özet makale:</b> Kuramın geçmişi, bugünü, geleceği; on beş ilkenin listesi tek tabloda.</li>
+  <li><b>Mayer (2020), kitabın içindekiler sayfası:</b> On beş ilkenin üç gruba dağılımı: 5 azalt, 3 yönet, 7 artır.</li>
+  <li><b>Sundararajan ve Adesope (2020), özet:</b> Dersin okuma listesinde; tutarlılık ilkesinin kanıtı. Konu dışı süs öğrenmeyi düşürür.</li>
+</ol>
+<div class="src"><div class="t">Mayer, R. E. (2020) <span>asıl · Multimedia Learning, 3. baskı, Cambridge University Press</span></div><p>On beş ilke burada. 2001'de 7, 2009'da 12, 2020'de 15 ilke.</p></div>
+<div class="src"><div class="t">Mayer, R. E. (2024) <span>asıl · Educational Psychology Review</span></div><p>"The past, present, and future of the cognitive theory of multimedia learning." Otuz yıllık özet; "otuz yıldır tek soru" cümlesi buradan.</p></div>
+<div class="src"><div class="t">Mayer, R. E. ve Fiorella, L. (ed.) (2022) <span>asıl · Cambridge Handbook of Multimedia Learning, 3. baskı</span></div><p>Her ilkenin ayrı bölümü var. Bir ilkede derinleşmek isteyen buradan devam etsin.</p></div>
+<div class="src"><div class="t">Sundararajan, N. ve Adesope, O. (2020) <span>destek · ders okuması · Educational Psychology Review</span></div><p>Çekici ayrıntılar meta-analizi. Slayt 11: konfeti ve "Did you know?" kutusu.</p></div>
+<div class="src"><div class="t">Paivio, A. (1986) <span>varsayım 1 · iki kanal</span></div><p>İkili kodlama: kelime ve resim ayrı işlenir.</p></div>
+<div class="src"><div class="t">Baddeley, A. (1992) <span>varsayım 2 · sınırlı kapasite</span></div><p>Çalışma belleği: aynı anda az şey.</p></div>
+<div class="src"><div class="t">Sweller, J. (1988) <span>varsayım 2 · bilişsel yük</span></div><p>Üç tür yük fikrinin kaynağı; Mayer'in "üç tür iş"i buna akraba. Dersin okuma listesindeki Sweller, van Merriënboer ve Paas (2019) aynı kuramın yirmi yıllık özeti.</p></div>
+<div class="src"><div class="t">Moreno, R. (2006) <span>sınırlar · duygu</span></div><p>Mayer'in modeline duygu ve motivasyonu ekleyen öğrencisi (CATLM).</p></div>
+<div class="src"><div class="t">Plass, J. L. ve Kaplan, U. (2016) <span>sınırlar · duygu</span></div><p>Duygu ve biliş iç içe (ICALM). Slayt 16'daki "soğuk model" eleştirisi.</p></div>
+<p>Künyelerdeki cilt ve sayfa bilgileri için sunumun kaynakça slaytına bakın; kütüphane veri tabanından ulaşırken yazar adı ve yıl yeter.</p>
+
+<footer>
+<p>Bu rehber, Gazi Üniversitesi Eğitim Teknolojisi Tezli Yüksek Lisans programı, Çoklu Ortam Tasarımı dersinde 5 Kasım 2026'da sunulan "Mayer ve 15 İlke" sunumunun (18 slayt) çalışma rehberidir; konuya ilgi duyan öğrenciler için hazırlandı. Hazırlayan: Cihangir Savaş Meşe.</p>
+<p>Sunum: <a href="https://cihangirsavasmese.github.io/coklu-ortam-tasarimi-duygusal-tasarim-ve-evrensel-tasarim-5-kasim-2026/">cihangirsavasmese.github.io/…</a> (adres önceki konunun adını taşıyor, içerik Mayer sunumu). Ok tuşları ya da boşlukla ilerler; telefonda sağa sola kaydırın.</p>
+</footer>
+</div>
+</body>
+</html>
